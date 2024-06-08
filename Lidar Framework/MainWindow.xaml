@@ -1,0 +1,182 @@
+﻿<Window x:Class="Lidar_Framework.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:HelixToolkit="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
+        xmlns:ScottPlot="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
+        xmlns:local="clr-namespace:Lidar_Framework" 
+        xmlns:helix="http://helix-toolkit.org/wpf"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="518" Width="674">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="MyBoolToVisibilityConverter" />
+
+        <!-- Стиль шрифта у TextBlock -->
+        <Style x:Key="CustomFontStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Margin" Value="10"/>
+        </Style>
+
+        <!-- Стиль шрифта у Button -->
+        <Style x:Key="CustomButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="DodgerBlue"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Margin" Value="10"/>
+        </Style>
+
+        <!-- Стиль шрифта у Expander -->
+        <Style x:Key="CustomExpanderStyle" TargetType="Expander">
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="IsExpanded" Value="True"/>
+            <Setter Property="Margin" Value="0,0,0,0"/>
+            <Setter Property="BorderBrush" Value="DodgerBlue"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+
+        </Style>
+
+    </Window.Resources>
+
+    <Grid x:Name="Main">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MinWidth="150"/>
+            <ColumnDefinition Width="4*" MinWidth="150"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Левый сайдбар -->
+        <Grid >
+            <Border BorderBrush="DodgerBlue" 
+                    BorderThickness="0,0,1,0" >
+                <!-- Меню -->
+                <StackPanel x:Name="Menu" CanVerticallyScroll="True" >
+                    <!-- Первый Expander "Подключить" -->
+                    <Expander x:Name="ConnectExpander" 
+                              Header="Подключить" 
+                              Style="{StaticResource CustomExpanderStyle}">
+                        <StackPanel>
+                            <Button x:Name="btnConnect" Content="Подключить" Style="{StaticResource CustomButtonStyle}" />
+                            <TextBox x:Name="tbPort" Margin="10" Text="Port" />
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- Второй Expander "Импорт" -->
+                    <Expander x:Name="ImportExpander" 
+                              Header="Импорт" 
+                              Style="{StaticResource CustomExpanderStyle}">
+                        <StackPanel>
+                            <Button x:Name="btnLoad" Content="Загрузить файл"  Style="{StaticResource CustomButtonStyle}" Click="btnLoad_Click"/>
+
+                            <ListBox x:Name="lbLastLoad" BorderBrush="{x:Null}" SelectionChanged="lbLastLoad_SelectionChanged">
+                                <!-- Шаблон для отображения имени файла и пути -->
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Vertical">
+                                            <TextBlock Text="{Binding FileName}" FontWeight="Bold" FontSize="18"/>
+                                            <TextBlock Text="{Binding Path}" FontStyle="Italic" FontSize="10"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- Третий Expander "Эскорт" -->
+                    <Expander x:Name="ExportExpander" 
+                              Header="Эскорт"  
+                              Style="{StaticResource CustomExpanderStyle}">
+                        <StackPanel>
+                            <Button x:Name="btnSave" Content="Сохранить файл" Style="{StaticResource CustomButtonStyle}" Click="btnSave_Click"/>
+
+                            <ListBox x:Name="lbLastSave" BorderBrush="{x:Null}">
+                                <!-- Шаблон для отображения имени файла и пути -->
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Vertical">
+                                            <TextBlock Text="{Binding FileName}" FontWeight="Bold" FontSize="18"/>
+                                            <TextBlock x:Name="tPath" Text="{Binding Path}" FontStyle="Italic" FontSize="10"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- Четвертый Expander "Данные о файле" -->
+                    <Expander x:Name="InfoOfFile" Header="Данные о файле" Style="{StaticResource CustomExpanderStyle}">
+                        <StackPanel>
+                            <!-- TextBlock для имени файла -->
+                            <TextBlock x:Name="FileNameTextBlock" Style="{StaticResource CustomFontStyle}" Text="{Binding FileName}"/>
+                            <!-- TextBlock для пути файла -->
+                            <TextBlock x:Name="FilePathTextBlock" Style="{StaticResource CustomFontStyle}" Text="{Binding FilePath}"/>
+                            <!-- TextBlock для расширения файла -->
+                            <TextBlock x:Name="FileExtensionTextBlock" Style="{StaticResource CustomFontStyle}" Text="{Binding FileExtension}"/>
+                            <!-- TextBlock для веса файла -->
+                            <TextBlock x:Name="FileWeightTextBlock" Style="{StaticResource CustomFontStyle}" Text="{Binding Weight}"/>
+                        </StackPanel>
+                    </Expander>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+
+
+        <!-- Правый сайдбар -->
+        <!-- Главное окно с вкладками -->
+        <TabControl 
+            x:Name="TabControls" 
+            Grid.Column="1" 
+            >
+
+            <!-- Вкладка для 2D визуализации -->
+            <TabItem x:Name="_2D" Header="2D" >
+                <Grid>
+                    <ScottPlot:WpfPlot x:Name="wpfPlot" />
+                </Grid>
+            </TabItem>
+
+
+            <!-- Вкладка для 3D визуализации -->
+            <TabItem 
+                x:Name="_3D" 
+                Header="3D"
+                Grid.Column="0"
+                >
+
+                <!-- 3D визуализация -->
+                <Grid 
+                    x:Name="Grid3D" 
+                    VerticalAlignment="Center" 
+                    
+                    Width="{Binding ActualWidth, ElementName=TabControls, Mode=OneWay}"
+                    Height="{Binding ActualHeight, ElementName=TabControls, Mode=OneWay}" 
+                    >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="158*"/>
+                        <RowDefinition Height="345*"/>
+                    </Grid.RowDefinitions>
+
+                    <helix:HelixViewport3D 
+                        x:Name="viewport3D" 
+                        Width="{Binding ActualWidth, ElementName=Grid3D, Mode=OneWay}"
+                        Height="{Binding ActualHeight, ElementName=Grid3D, Mode=OneWay}" 
+                         MinWidth="100" MinHeight="50" Grid.RowSpan="2" >
+
+                        <!-- 3D контент будет добавлен программно -->
+                    </helix:HelixViewport3D>
+
+                </Grid>
+
+            </TabItem>
+        </TabControl>
+
+    </Grid>
+</Window>
